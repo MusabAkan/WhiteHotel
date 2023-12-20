@@ -18,4 +18,8 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\WhiteHotel.Domain\WhiteHotel.Domain.csproj" />
+  </ItemGroup>
+
 </Project>

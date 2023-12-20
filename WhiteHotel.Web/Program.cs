@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using WhiteHotel.Infrastructure.DataAccess;
+using WhiteHotel.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
