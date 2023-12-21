@@ -56,17 +56,28 @@ namespace WhiteHotel.Web.Controllers
                 _context.SaveChanges();
                 return RedirectToAction("Index");
             }
-            return View();
+            return RedirectToAction("Error", "Home");
         }
-
         public IActionResult Delete(int villaId)
         {
             var result = _context.Villas.FirstOrDefault(u => u.Id == villaId);
             if (result == null)
                 return RedirectToAction("Error", "Home");
-            _context.Villas.Remove(result);
-            _context.SaveChanges();
-            return RedirectToAction("Index");
+            return View(result);
         }
+
+        [HttpPost]
+        public IActionResult Delete(Villa model)
+        {
+            if (ModelState.IsValid)
+            {
+                _context.Villas.Remove(model);
+                _context.SaveChanges();
+                return RedirectToAction("Index");
+            }
+            return RedirectToAction("Error", "Home");
+        }
+
+     
     }
 }
