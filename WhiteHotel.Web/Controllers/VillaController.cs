@@ -34,10 +34,10 @@ namespace WhiteHotel.Web.Controllers
             {
                 _context.Villas.Add(model);
                 _context.SaveChanges();
+                TempData["success"] = "The villa has been created successfully";
                 return RedirectToAction("Index");
             }
             return View();
-           
         }
         public IActionResult Update(int villaId)
         {
@@ -46,7 +46,6 @@ namespace WhiteHotel.Web.Controllers
                 return RedirectToAction("Error","Home");
             return View(result);
         }
-
         [HttpPost]
         public IActionResult Update(Villa model)
         {
@@ -54,6 +53,7 @@ namespace WhiteHotel.Web.Controllers
             {
                 _context.Villas.Update(model);
                 _context.SaveChanges();
+                TempData["success"] = "The villa has been updated successfully";
                 return RedirectToAction("Index");
             }
             return RedirectToAction("Error", "Home");
@@ -65,7 +65,6 @@ namespace WhiteHotel.Web.Controllers
                 return RedirectToAction("Error", "Home");
             return View(result);
         }
-
         [HttpPost]
         public IActionResult Delete(Villa model)
         {
@@ -73,8 +72,10 @@ namespace WhiteHotel.Web.Controllers
             {
                 _context.Villas.Remove(model);
                 _context.SaveChanges();
+                TempData["success"] = "The villa has been deleted successfully";
                 return RedirectToAction("Index");
             }
+            TempData["error"] = "The villa could not be deleted";
             return RedirectToAction("Error", "Home");
         }
 
