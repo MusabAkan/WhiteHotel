@@ -4,7 +4,6 @@ using WhiteHotel.Infrastructure.Data;
 
 namespace WhiteHotel.Web.Controllers
 {
-
     public class VillaController : Controller
     {
         readonly ApplicationDbContext _context;

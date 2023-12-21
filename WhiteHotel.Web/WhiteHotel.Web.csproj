@@ -23,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <_ContentIncludedByDefault Remove="Views\VillaNumber\Index.cshtml" />
     <_ContentIncludedByDefault Remove="Views\Villa\Delete.cshtml" />
     <_ContentIncludedByDefault Remove="Views\Villa\Index.cshtml" />
     <_ContentIncludedByDefault Remove="Views\Villa\Update.cshtml" />
@@ -34,6 +35,10 @@
 
   <ItemGroup>
     <UpToDateCheckInput Remove="Views\Villa\Delete.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Views\VillaNumber\Index.cshtml" />
   </ItemGroup>
 
 </Project>
