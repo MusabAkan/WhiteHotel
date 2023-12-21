@@ -18,4 +18,12 @@
     <ProjectReference Include="..\WhiteHotel.Infrastructure\WhiteHotel.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Views\Villa\Index.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Views\Villa\Index.cshtml" />
+  </ItemGroup>
+
 </Project>
