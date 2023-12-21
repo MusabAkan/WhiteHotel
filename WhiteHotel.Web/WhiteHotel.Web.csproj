@@ -24,6 +24,11 @@
 
   <ItemGroup>
     <_ContentIncludedByDefault Remove="Views\Villa\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Villa\Update.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Views\Villa\Update.cshtml" />
   </ItemGroup>
 
 </Project>
