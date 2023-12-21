@@ -23,7 +23,6 @@ namespace WhiteHotel.Web.Controllers
         {
             return View();
         }
-
         [HttpPost]
         public IActionResult Create(Villa model)
         {
@@ -40,20 +39,34 @@ namespace WhiteHotel.Web.Controllers
             return View();
            
         }
-
         public IActionResult Update(int villaId)
         {
             var result = _context.Villas.FirstOrDefault(u => u.Id == villaId);
             if (result == null)
-            {
-                return NotFound();
-            }
+                return RedirectToAction("Error","Home");
             return View(result);
         }
 
-        public IActionResult Delete()
+        [HttpPost]
+        public IActionResult Update(Villa model)
         {
-            throw new NotImplementedException();
+            if (ModelState.IsValid && model.Id > default(int)) 
+            {
+                _context.Villas.Update(model);
+                _context.SaveChanges();
+                return RedirectToAction("Index");
+            }
+            return View();
+        }
+
+        public IActionResult Delete(int villaId)
+        {
+            var result = _context.Villas.FirstOrDefault(u => u.Id == villaId);
+            if (result == null)
+                return RedirectToAction("Error", "Home");
+            _context.Villas.Remove(result);
+            _context.SaveChanges();
+            return RedirectToAction("Index");
         }
     }
 }
