@@ -1,6 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
-using WhiteHotel.Web.Models;
 
 namespace WhiteHotel.Web.Controllers
 {

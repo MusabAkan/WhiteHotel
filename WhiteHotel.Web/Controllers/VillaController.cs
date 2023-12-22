@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WhiteHotel.Domain.Entities;
 using WhiteHotel.Infrastructure.Data;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace WhiteHotel.Web.Controllers
 {
@@ -34,7 +35,7 @@ namespace WhiteHotel.Web.Controllers
                 _context.Villas.Add(model);
                 _context.SaveChanges();
                 TempData["success"] = "The villa has been created successfully";
-                return RedirectToAction("Index");
+                return RedirectToAction(nameof(Index));
             }
             return View();
         }
@@ -42,7 +43,7 @@ namespace WhiteHotel.Web.Controllers
         {
             var result = _context.Villas.FirstOrDefault(u => u.Id == villaId);
             if (result == null)
-                return RedirectToAction("Error","Home");
+                return RedirectToAction(nameof(HomeController.Error),"Home");
             return View(result);
         }
         [HttpPost]
@@ -53,15 +54,15 @@ namespace WhiteHotel.Web.Controllers
                 _context.Villas.Update(model);
                 _context.SaveChanges();
                 TempData["success"] = "The villa has been updated successfully";
-                return RedirectToAction("Index");
+                return RedirectToAction(nameof(Index));
             }
-            return RedirectToAction("Error", "Home");
+            return RedirectToAction(nameof(HomeController.Error), "Home");
         }
         public IActionResult Delete(int villaId)
         {
             var result = _context.Villas.FirstOrDefault(u => u.Id == villaId);
             if (result == null)
-                return RedirectToAction("Error", "Home");
+                return RedirectToAction(nameof(HomeController.Error), "Home");
             return View(result);
         }
         [HttpPost]
@@ -72,10 +73,10 @@ namespace WhiteHotel.Web.Controllers
                 _context.Villas.Remove(model);
                 _context.SaveChanges();
                 TempData["success"] = "The villa has been deleted successfully";
-                return RedirectToAction("Index");
+                return RedirectToAction(nameof(Index));
             }
-            TempData["error"] = "The villa could not be deleted";
-            return RedirectToAction("Error", "Home");
+            TempData[nameof(Error)] = "The villa could not be deleted";
+            return RedirectToAction(nameof(HomeController.Error), "Home");
         }
 
      
