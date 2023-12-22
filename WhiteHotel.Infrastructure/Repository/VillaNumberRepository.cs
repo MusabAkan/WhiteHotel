@@ -4,16 +4,16 @@ using WhiteHotel.Infrastructure.Data;
 
 namespace WhiteHotel.Infrastructure.Repository
 {
-    public class VillaRepository : Repository<Villa>, IVillaRepository
+    public class VillaNumberRepository : Repository<VillaNumber>, IVillaNumberRepository
     {
         readonly ApplicationDbContext _db;
-        public VillaRepository(ApplicationDbContext db) : base(db) 
+        public VillaNumberRepository(ApplicationDbContext db) : base(db)
         {
             _db = db;
         }
-        public void Update(Villa entity)
+        public void Update(VillaNumber entity)
         {
-            _db.Villas.Update(entity);
+            _db.VillaNumbers.Update(entity);
         }
     }
 }

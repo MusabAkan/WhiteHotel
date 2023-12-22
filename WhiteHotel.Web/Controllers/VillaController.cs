@@ -6,18 +6,17 @@ namespace WhiteHotel.Web.Controllers
 {
     public class VillaController : Controller
     {
-        readonly IVillaRepository _repository;
+        readonly IUnitOfWork _unitOfWork;
 
-        public VillaController(IVillaRepository repository)
+        public VillaController(IUnitOfWork unitOfWork)
         {
-            _repository = repository;
+            _unitOfWork = unitOfWork;
         }
         public IActionResult Index()
         {
-            var result = _repository.GetAll();
+            var result = _unitOfWork.Villa.GetAll();
             return View(result);
         }
-
         public IActionResult Create()
         {
             return View();
@@ -31,8 +30,8 @@ namespace WhiteHotel.Web.Controllers
             }
             if (ModelState.IsValid)
             {
-                _repository.Add(model);
-                _repository.Save();
+                _unitOfWork.Villa.Add(model);
+                _unitOfWork.Save();
                 TempData["success"] = "The villa has been created successfully";
                 return RedirectToAction(nameof(Index));
             }
@@ -40,7 +39,7 @@ namespace WhiteHotel.Web.Controllers
         }
         public IActionResult Update(int villaId)
         {
-            var result = _repository.Get(u => u.Id == villaId);
+            var result = _unitOfWork.Villa.Get(u => u.Id == villaId);
             if (result == null)
                 return RedirectToAction("Error", "Home");
             return View(result);
@@ -50,8 +49,8 @@ namespace WhiteHotel.Web.Controllers
         {
             if (ModelState.IsValid && model.Id > default(int)) 
             {
-                _repository.Update(model);
-                _repository.Save();
+                _unitOfWork.Villa.Update(model);
+                _unitOfWork.Save();
                 TempData["success"] = "The villa has been updated successfully";
                 return RedirectToAction(nameof(Index));
             }
@@ -59,7 +58,7 @@ namespace WhiteHotel.Web.Controllers
         }
         public IActionResult Delete(int villaId)
         {
-            var result = _repository.Get(u => u.Id == villaId);
+            var result = _unitOfWork.Villa.Get(u => u.Id == villaId);
             if (result == null)
                 return RedirectToAction("Error", "Home");
             return View(result);
@@ -67,11 +66,11 @@ namespace WhiteHotel.Web.Controllers
         [HttpPost]
         public IActionResult Delete(Villa model)
         {
-            var result = _repository.Get(u => u.Id == model.Id);
+            var result = _unitOfWork.Villa.Get(u => u.Id == model.Id);
             if (result is not null)
             {
-                _repository.Remove(model);
-                _repository.Save();
+                _unitOfWork.Villa.Remove(model);
+                _unitOfWork.Save();
                 TempData["success"] = "The villa has been deleted successfully";
                 return RedirectToAction(nameof(Index));
             }
