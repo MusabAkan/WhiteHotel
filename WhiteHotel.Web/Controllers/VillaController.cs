@@ -7,10 +7,12 @@ namespace WhiteHotel.Web.Controllers
     public class VillaController : Controller
     {
         readonly IUnitOfWork _unitOfWork;
+        readonly IWebHostEnvironment _webHostEnvironment;
 
-        public VillaController(IUnitOfWork unitOfWork)
+        public VillaController(IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnvironment)
         {
             _unitOfWork = unitOfWork;
+            _webHostEnvironment = webHostEnvironment;
         }
         public IActionResult Index()
         {
@@ -30,9 +32,25 @@ namespace WhiteHotel.Web.Controllers
             }
             if (ModelState.IsValid)
             {
+                if (model.Image != null)
+                {
+                   
+                    string fileName = Convert.ToString(Guid.NewGuid()) + Path.GetExtension(model.Image.FileName);
+                    string imagePath = Path.Combine(_webHostEnvironment.WebRootPath, @"images\VillaImage");
+
+                    using var fileStream = new FileStream(Path.Combine(imagePath, fileName), FileMode.Create);
+
+                    model.Image.CopyTo(fileStream);
+                    model.ImageUrl = @"images\VillaImage\" + fileName;
+                }
+                else
+                    model.ImageUrl = "https://placehold.co/600x400";
+
                 _unitOfWork.Villa.Add(model);
                 _unitOfWork.Save();
+
                 TempData["success"] = "The villa has been created successfully";
+
                 return RedirectToAction(nameof(Index));
             }
             return View();
@@ -40,14 +58,16 @@ namespace WhiteHotel.Web.Controllers
         public IActionResult Update(int villaId)
         {
             var result = _unitOfWork.Villa.Get(u => u.Id == villaId);
+
             if (result == null)
                 return RedirectToAction("Error", "Home");
+
             return View(result);
         }
         [HttpPost]
         public IActionResult Update(Villa model)
         {
-            if (ModelState.IsValid && model.Id > default(int)) 
+            if (ModelState.IsValid && model.Id > default(int))
             {
                 _unitOfWork.Villa.Update(model);
                 _unitOfWork.Save();
@@ -78,6 +98,6 @@ namespace WhiteHotel.Web.Controllers
             return RedirectToAction("Error", "Home");
         }
 
-     
+
     }
 }
