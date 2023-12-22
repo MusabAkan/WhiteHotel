@@ -1,21 +1,20 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using WhiteHotel.Application.Common.Interfaces;
 using WhiteHotel.Domain.Entities;
-using WhiteHotel.Infrastructure.Data;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace WhiteHotel.Web.Controllers
 {
     public class VillaController : Controller
     {
-        readonly ApplicationDbContext _context;
+        readonly IVillaRepository _repository;
 
-        public VillaController(ApplicationDbContext context)
+        public VillaController(IVillaRepository repository)
         {
-            _context = context;
+            _repository = repository;
         }
         public IActionResult Index()
         {
-            var result = _context.Villas.ToList();
+            var result = _repository.GetAll();
             return View(result);
         }
 
@@ -32,8 +31,8 @@ namespace WhiteHotel.Web.Controllers
             }
             if (ModelState.IsValid)
             {
-                _context.Villas.Add(model);
-                _context.SaveChanges();
+                _repository.Add(model);
+                _repository.Save();
                 TempData["success"] = "The villa has been created successfully";
                 return RedirectToAction(nameof(Index));
             }
@@ -41,9 +40,9 @@ namespace WhiteHotel.Web.Controllers
         }
         public IActionResult Update(int villaId)
         {
-            var result = _context.Villas.FirstOrDefault(u => u.Id == villaId);
+            var result = _repository.Get(u => u.Id == villaId);
             if (result == null)
-                return RedirectToAction(nameof(HomeController.Error),"Home");
+                return RedirectToAction("Error", "Home");
             return View(result);
         }
         [HttpPost]
@@ -51,32 +50,33 @@ namespace WhiteHotel.Web.Controllers
         {
             if (ModelState.IsValid && model.Id > default(int)) 
             {
-                _context.Villas.Update(model);
-                _context.SaveChanges();
+                _repository.Update(model);
+                _repository.Save();
                 TempData["success"] = "The villa has been updated successfully";
                 return RedirectToAction(nameof(Index));
             }
-            return RedirectToAction(nameof(HomeController.Error), "Home");
+            return RedirectToAction("Error", "Home");
         }
         public IActionResult Delete(int villaId)
         {
-            var result = _context.Villas.FirstOrDefault(u => u.Id == villaId);
+            var result = _repository.Get(u => u.Id == villaId);
             if (result == null)
-                return RedirectToAction(nameof(HomeController.Error), "Home");
+                return RedirectToAction("Error", "Home");
             return View(result);
         }
         [HttpPost]
         public IActionResult Delete(Villa model)
         {
-            if (ModelState.IsValid)
+            var result = _repository.Get(u => u.Id == model.Id);
+            if (result is not null)
             {
-                _context.Villas.Remove(model);
-                _context.SaveChanges();
+                _repository.Remove(model);
+                _repository.Save();
                 TempData["success"] = "The villa has been deleted successfully";
                 return RedirectToAction(nameof(Index));
             }
-            TempData[nameof(Error)] = "The villa could not be deleted";
-            return RedirectToAction(nameof(HomeController.Error), "Home");
+            TempData["error"] = "The villa could not be deleted";
+            return RedirectToAction("Error", "Home");
         }
 
      

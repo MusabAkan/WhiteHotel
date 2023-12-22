@@ -42,7 +42,7 @@ namespace WhiteHotel.Web.Controllers
                 _context.VillaNumbers.Add(model.VillaNumber);
                 _context.SaveChanges();
                 TempData["success"] = "The villa number has been created successfully";
-                return RedirectToAction("Index");
+                return RedirectToAction("Index");   
             }
 
             if (roomNumberExists)
