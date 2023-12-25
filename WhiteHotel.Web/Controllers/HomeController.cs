@@ -1,23 +1,28 @@
 using Microsoft.AspNetCore.Mvc;
+using WhiteHotel.Application.Common.Interfaces;
+using WhiteHotel.Web.ViewModels;
 
 namespace WhiteHotel.Web.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        readonly IUnitOfWork _unitOfWork;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(IUnitOfWork unitOfWork)
         {
-            _logger = logger;
+            _unitOfWork = unitOfWork;
         }
+
         public IActionResult Index()
         {
-            return View();
-        }
-        public IActionResult Privacy()
-        {
-            return View();
-        }
+            HomeVM homeVM = new()
+            {
+                VillaList = _unitOfWork.Villa.GetAll(includeProperties: "VillaAmenity"),
+                Nights = 1,
+                CheckInDate = DateOnly.FromDateTime(DateTime.Now)
+            };
+            return View(homeVM);
+        }     
         public IActionResult Error()
         {
             return View();
