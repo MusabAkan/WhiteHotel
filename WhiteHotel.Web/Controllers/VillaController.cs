@@ -41,7 +41,7 @@ namespace WhiteHotel.Web.Controllers
                     using var fileStream = new FileStream(Path.Combine(imagePath, fileName), FileMode.Create);
 
                     model.Image.CopyTo(fileStream);
-                    model.ImageUrl = @"images\VillaImage\" + fileName;
+                    model.ImageUrl = @"\images\VillaImage\" + fileName;
                 }
                 else
                     model.ImageUrl = "https://placehold.co/600x400";
@@ -69,6 +69,27 @@ namespace WhiteHotel.Web.Controllers
         {
             if (ModelState.IsValid && model.Id > default(int))
             {
+                if (model.Image != null)
+                {
+
+                    string fileName = Convert.ToString(Guid.NewGuid()) + Path.GetExtension(model.Image.FileName);
+                    string imagePath = Path.Combine(_webHostEnvironment.WebRootPath, @"images\VillaImage");
+
+                    if (!string.IsNullOrEmpty(model.ImageUrl))
+                    {
+                        var oldImagePath = Path.Combine(_webHostEnvironment.WebRootPath, model.ImageUrl.TrimStart('\\'));
+                        if (System.IO.File.Exists(oldImagePath))
+                            System.IO.File.Delete(oldImagePath);
+                    }
+
+                    using var fileStream = new FileStream(Path.Combine(imagePath, fileName), FileMode.Create);
+
+                    model.Image.CopyTo(fileStream);
+                    model.ImageUrl = @"\images\VillaImage\" + fileName;
+                }
+                else
+                    model.ImageUrl = "https://placehold.co/600x400";
+
                 _unitOfWork.Villa.Update(model);
                 _unitOfWork.Save();
                 TempData["success"] = "The villa has been updated successfully";
@@ -89,7 +110,14 @@ namespace WhiteHotel.Web.Controllers
             var result = _unitOfWork.Villa.Get(u => u.Id == model.Id);
             if (result is not null)
             {
-                _unitOfWork.Villa.Remove(model);
+                if (!string.IsNullOrEmpty(model.ImageUrl))
+                {
+                    var oldImagePath = Path.Combine(_webHostEnvironment.WebRootPath, model.ImageUrl.TrimStart('\\'));
+                    if (System.IO.File.Exists(oldImagePath))
+                        System.IO.File.Delete(oldImagePath);
+                }
+
+                _unitOfWork.Villa.Remove(result);
                 _unitOfWork.Save();
                 TempData["success"] = "The villa has been deleted successfully";
                 return RedirectToAction(nameof(Index));
