@@ -17,7 +17,7 @@ namespace WhiteHotel.Domain.Entities
         public int Sqft { get; set; }
         [Range(1, 10)]
         public int Occupancy { get; set; }
-        [NotMapped] 
+        [NotMapped]
         public IFormFile? Image { get; set; }
 
         [Display(Name = "Image Url")]
@@ -26,5 +26,7 @@ namespace WhiteHotel.Domain.Entities
         public DateTime? Updated_Date { get; set; }
         [ValidateNever]
         public IEnumerable<Amenity> VillaAmenity { get; set; }
+        [NotMapped]
+        public bool IsAvailable { get; set; } = true;
     }
 }
