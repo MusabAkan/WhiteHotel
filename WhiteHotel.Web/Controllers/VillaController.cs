@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WhiteHotel.Application.Common.Interfaces;
+using WhiteHotel.Application.Common.Utility;
 using WhiteHotel.Domain.Entities;
 
 namespace WhiteHotel.Web.Controllers
 {
+    [Authorize]
     public class VillaController : Controller
     {
         readonly IUnitOfWork _unitOfWork;

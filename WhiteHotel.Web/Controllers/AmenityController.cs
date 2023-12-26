@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using WhiteHotel.Application.Common.Interfaces;
+using WhiteHotel.Application.Common.Utility;
 using WhiteHotel.Web.ViewModels;
 
 namespace WhiteHotel.Web.Controllers
 {
+    [Authorize(Roles = SD.Role_Admin)]
     public class AmenityController : Controller
     {
         readonly IUnitOfWork _unitOfWork;
@@ -38,8 +41,8 @@ namespace WhiteHotel.Web.Controllers
                 _unitOfWork.Amenity.Add(model.Amenity);
                 _unitOfWork.Save();
                 TempData["success"] = "The amenity has been created successfully";
-                return RedirectToAction(nameof(Index));   
-            }            
+                return RedirectToAction(nameof(Index));
+            }
 
             model.VillaList = _unitOfWork.Villa.GetAll().Select(u => new SelectListItem()
             {
