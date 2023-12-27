@@ -14,7 +14,7 @@ namespace WhiteHotel.Web.Controllers
         readonly UserManager<ApplicationUser> _userManager;
         readonly SignInManager<ApplicationUser> _signInManager;
         readonly RoleManager<IdentityRole> _roleManager;
-
+        
         public AccountController(RoleManager<IdentityRole> roleManager, SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, IUnitOfWork unitOfWork)
         {
             _roleManager = roleManager;
@@ -24,11 +24,11 @@ namespace WhiteHotel.Web.Controllers
         }
 
         public IActionResult Login(string returnUrl = null)
-        { 
+        {
             returnUrl ??= Url.Content("~/");
             LoginVM loginVM = new()
             {
-                RedirectUrl = returnUrl,
+                RedirectUrl = returnUrl
             };
             return View(loginVM);
         }
@@ -39,7 +39,7 @@ namespace WhiteHotel.Web.Controllers
         }
         public IActionResult Register(string returnUrl = null)
         {
-            returnUrl ??= Url.Content("~/"); 
+            returnUrl ??= Url.Content("~/");
 
             createRole(SD.Role_Admin);
             createRole(SD.Role_Customer);
@@ -50,7 +50,8 @@ namespace WhiteHotel.Web.Controllers
                 {
                     Text = x.Name,
                     Value = x.Name
-                })
+                }),
+                RedirectUrl = returnUrl 
             };
 
             return View(registerVM);
@@ -59,7 +60,7 @@ namespace WhiteHotel.Web.Controllers
             {
                 if (!_roleManager.RoleExistsAsync(role).GetAwaiter().GetResult())
                     _roleManager.CreateAsync(new IdentityRole(role)).Wait();
-            }
+        }
         }
         [HttpPost]
         public async Task<IActionResult> Register(RegisterVM registerVM)
@@ -74,7 +75,7 @@ namespace WhiteHotel.Web.Controllers
                     NormalizedEmail = registerVM.Email.ToUpper(),
                     EmailConfirmed = true,
                     UserName = registerVM.Email,
-                    CreateAt = DateTime.Now,
+                    CreatedAt = DateTime.Now
                 };
 
                 var result = await _userManager.CreateAsync(user, registerVM.Password);
@@ -92,17 +93,17 @@ namespace WhiteHotel.Web.Controllers
                         return RedirectToAction(nameof(Index), "Home");
                     else
                         return LocalRedirect(registerVM.RedirectUrl);
-                }
+                    }
                 foreach (var error in result.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
-                }
+                } 
 
-            }           
+            }
             registerVM.RoleList = _roleManager.Roles.Select(x => new SelectListItem
             {
                 Text = x.Name,
-                Value = x.Id
+                Value = x.Name
             });
 
             return View(registerVM);
@@ -120,16 +121,22 @@ namespace WhiteHotel.Web.Controllers
                 var result = await _signInManager.PasswordSignInAsync(loginVM.Email, loginVM.Password, loginVM.RememberMe, lockoutOnFailure: false);
 
                 if (result.Succeeded)
-                { 
-
-                    if (string.IsNullOrEmpty(loginVM.RedirectUrl))
-                        return RedirectToAction(nameof(Index), "Home");
+                {
+                    var user = await _userManager.FindByEmailAsync(loginVM.Email);
+                    
+                    if (await _userManager.IsInRoleAsync(user, SD.Role_Admin))                   
+                        return RedirectToAction("Index", "Dashboard");                    
                     else
-                        return LocalRedirect(loginVM.RedirectUrl);
+                    {
+                        if (string.IsNullOrEmpty(loginVM.RedirectUrl))
+                        return RedirectToAction(nameof(Index), "Home");
+                        else
+                            return LocalRedirect(loginVM.RedirectUrl);                        
+                    }
                 }
                 else
                     ModelState.AddModelError(string.Empty, "Invalid login attempt");              
-            }   
+            }
             return View(loginVM);
         }
     }

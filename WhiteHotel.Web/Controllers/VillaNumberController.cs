@@ -1,7 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using WhiteHotel.Application.Common.Interfaces;
+using WhiteHotel.Application.Services.Interface;
+using WhiteHotel.Domain.Entities;
+using WhiteHotel.Infrastructure.Data;
 using WhiteHotel.Web.ViewModels;
 
 namespace WhiteHotel.Web.Controllers
@@ -9,124 +13,131 @@ namespace WhiteHotel.Web.Controllers
     [Authorize]
     public class VillaNumberController : Controller
     {
-        readonly IUnitOfWork _unitOfWork;
-
-        public VillaNumberController(IUnitOfWork unitOfWork)
+        private readonly IVillaNumberService _villaNumberService;
+        private readonly IVillaService _villaService;
+        public VillaNumberController(IVillaNumberService villaNumberService, IVillaService villaService)
         {
-            _unitOfWork = unitOfWork;
+            _villaService = villaService;
+            _villaNumberService = villaNumberService;
         }
+
         public IActionResult Index()
         {
-            var result = _unitOfWork.VillaNumber.GetAll(includeProperties: "Villa");
-            return View(result);
+            var villaNumbers = _villaNumberService.GetAllVillaNumbers();
+            return View(villaNumbers);
         }
+
         public IActionResult Create()
         {
-            VillaNumberVM villaNumberVm = new()
+            VillaNumberVM villaNumberVM = new()
             {
-                VillaList = _unitOfWork.Villa.GetAll().Select(item => new SelectListItem
+                VillaList = _villaService.GetAllVillas().Select(u => new SelectListItem
                 {
-                    Text = item.Name,
-                    Value = item.Id.ToString()
+                    Text = u.Name,
+                    Value = u.Id.ToString()
                 })
             };
-            return View(villaNumberVm);
+            return View(villaNumberVM);
         }
+
         [HttpPost]
-        public IActionResult Create(VillaNumberVM model)
+        public IActionResult Create(VillaNumberVM obj)
         {
             //ModelState.Remove("Villa");
-            bool roomNumberExists = _unitOfWork.VillaNumber.Any(u => u.Villa_Number == model.VillaNumber.Villa_Number);
+
+            bool roomNumberExists =  _villaNumberService.CheckVillaNumberExists(obj.VillaNumber.Villa_Number);
+
             if (ModelState.IsValid && !roomNumberExists)
             {
-                _unitOfWork.VillaNumber.Add(model.VillaNumber);
-                _unitOfWork.Save();
-                TempData["success"] = "The villa number has been created successfully";
-                return RedirectToAction(nameof(Index));   
+                _villaNumberService.CreateVillaNumber(obj.VillaNumber);
+                TempData["success"] = "The villa Number has been created successfully.";
+                return RedirectToAction(nameof(Index));
             }
 
             if (roomNumberExists)
-                TempData["error"] = "The villa number already exists.";
-
-            model.VillaList = _unitOfWork.Villa.GetAll().Select(u => new SelectListItem()
+            {
+                TempData["error"] = "The villa Number already exists.";
+            }
+            obj.VillaList = _villaService.GetAllVillas().Select(u => new SelectListItem
             {
                 Text = u.Name,
                 Value = u.Id.ToString()
             });
-
-            return View(model);
+            return View(obj);
         }
+
         public IActionResult Update(int villaNumberId)
         {
-            VillaNumberVM villaNumberVm = new()
+            VillaNumberVM villaNumberVM = new()
             {
-                VillaList = _unitOfWork.Villa.GetAll().Select(item => new SelectListItem
+                VillaList = _villaService.GetAllVillas().Select(u => new SelectListItem
                 {
-                    Text = item.Name,
-                    Value = item.Id.ToString()
+                    Text = u.Name,
+                    Value = u.Id.ToString()
                 }),
-                VillaNumber = _unitOfWork.VillaNumber.Get(u => u.Villa_Number == villaNumberId)
+                VillaNumber = _villaNumberService.GetVillaNumberById(villaNumberId)
             };
-
-            if (villaNumberVm.VillaNumber == null)
+            if (villaNumberVM.VillaNumber == null)
+            {
                 return RedirectToAction("Error", "Home");
-
-            return View(villaNumberVm);
+            }
+            return View(villaNumberVM);
         }
+
+
         [HttpPost]
-        public IActionResult Update(VillaNumberVM model)
+        public IActionResult Update(VillaNumberVM villaNumberVM)
         {
 
             if (ModelState.IsValid)
             {
-                _unitOfWork.VillaNumber.Update(model.VillaNumber);
-                _unitOfWork.Save();
-                TempData["success"] = "The villa number has been updated successfully";
+                _villaNumberService.UpdateVillaNumber(villaNumberVM.VillaNumber);
+                TempData["success"] = "The villa Number has been updated successfully.";
                 return RedirectToAction(nameof(Index));
             }
 
-            model.VillaList = _unitOfWork.Villa.GetAll().Select(u => new SelectListItem()
+            villaNumberVM.VillaList = _villaService.GetAllVillas().Select(u => new SelectListItem
             {
                 Text = u.Name,
                 Value = u.Id.ToString()
             });
-
-            return View(model);
+            return View(villaNumberVM);
         }
+
+
+
         public IActionResult Delete(int villaNumberId)
         {
-            VillaNumberVM villaNumberVm = new()
+            VillaNumberVM villaNumberVM = new()
             {
-                VillaList = _unitOfWork.Villa.GetAll().Select(item => new SelectListItem
+                VillaList = _villaService.GetAllVillas().Select(u => new SelectListItem
                 {
-                    Text = item.Name,
-                    Value = item.Id.ToString()
+                    Text = u.Name,
+                    Value = u.Id.ToString()
                 }),
-                VillaNumber = _unitOfWork.VillaNumber.Get(u => u.Villa_Number == villaNumberId)
+                VillaNumber = _villaNumberService.GetVillaNumberById(villaNumberId)
             };
-
-            if (villaNumberVm.VillaNumber == null)
-                return RedirectToAction("Error", "Home");
-
-            return View(villaNumberVm);
-        }
-        [HttpPost]
-        public IActionResult Delete(VillaNumberVM model)
-        {
-            var result = _unitOfWork.VillaNumber.Get(u => u.Villa_Number == model.VillaNumber.Villa_Number);
-
-            if (result is not null)
+            if (villaNumberVM.VillaNumber == null)
             {
-                _unitOfWork.VillaNumber.Remove(result);
-                _unitOfWork.Save();
-                TempData["success"] = "The villa number has been deleted successfully";
+                return RedirectToAction("Error", "Home");
+            }
+            return View(villaNumberVM);
+        }
+
+
+
+        [HttpPost]
+        public IActionResult Delete(VillaNumberVM villaNumberVM)
+        {
+            VillaNumber? objFromDb = _villaNumberService.GetVillaNumberById(villaNumberVM.VillaNumber.Villa_Number);
+            if (objFromDb is not null)
+            {
+                _villaNumberService.DeleteVillaNumber(objFromDb.Villa_Number);
+                TempData["success"] = "The villa number has been deleted successfully.";
                 return RedirectToAction(nameof(Index));
             }
-
-            TempData["error"] = "The villa number could not be deleted";
+            TempData["error"] = "The villa number could not be deleted.";
             return View();
         }
     }
-
-
 }

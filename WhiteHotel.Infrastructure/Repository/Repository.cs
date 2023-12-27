@@ -14,9 +14,14 @@ namespace WhiteHotel.Infrastructure.Repository
             _db = context;
             _dbSet = _db.Set<T>();
         }
-        public IEnumerable<T> GetAll(Expression<Func<T, bool>>? filter = null, string? includeProperties = null)
+        public IEnumerable<T> GetAll(Expression<Func<T, bool>>? filter = null, string? includeProperties = null, bool tracked = false)
         {
-            IQueryable<T> queryable = _dbSet;
+            IQueryable<T> queryable;
+
+            if (tracked)
+                queryable = _dbSet;
+            else
+                queryable = _dbSet.AsNoTracking();
 
             if (filter != null)
                 queryable = queryable.Where(filter);
@@ -30,9 +35,14 @@ namespace WhiteHotel.Infrastructure.Repository
 
             return queryable.ToList();
         }
-        public T Get(Expression<Func<T, bool>> filter, string? includeProperties = null)
+        public T Get(Expression<Func<T, bool>> filter, string? includeProperties = null, bool tracked = false)
         {
-            IQueryable<T> queryable = _dbSet;
+            IQueryable<T> queryable;
+
+            if (tracked)
+                queryable = _dbSet;
+            else
+                queryable = _dbSet.AsNoTracking();
 
             if (filter != null)
                 queryable = queryable.Where(filter);

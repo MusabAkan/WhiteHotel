@@ -4,7 +4,7 @@
     <div class="card-header bg-success bg-gradient ml-0 py-3">
         <div class="row">
             <div class="col-12 text-center">
-                <h2 class="text-white py-2">Delete Amenity</h2>
+                <h2 class="text-white py-2">Update Amenity</h2>
             </div>
         </div>
     </div>
@@ -22,12 +22,12 @@
                     <span asp-validation-for="Amenity.VillaId" class="text-danger"></span>
                 </div>
                 <div class="form-floating py-1 col-12">
-                    <input asp-for="Amenity.Name" readonly class="form-control border shadow" disabled />
+                    <input asp-for="Amenity.Name" readonly class="form-control border shadow" />
                     <label asp-for="Amenity.Name" class="ms-2"></label>
                     <span asp-validation-for="Amenity.Name" class="text-danger"></span>
                 </div>
                 <div class="form-floating py-1 col-12">
-                    <input asp-for="Amenity.Description" readonly class="form-control border shadow" disabled />
+                    <input asp-for="Amenity.Description" readonly class="form-control border shadow" />
                     <label asp-for="Amenity.Description" class="ms-2"></label>
                     <span asp-validation-for="Amenity.Description" class="text-danger"></span>
                 </div>
@@ -49,7 +49,7 @@
     </div>
 </div>
 
-@section Scripts {
+@section Scripts{
     @{
         <partial name="_ValidationScriptsPartial" />
     }

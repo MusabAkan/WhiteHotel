@@ -14,6 +14,7 @@ namespace WhiteHotel.Web.ViewModels
         [Required]
         [DataType(DataType.Password)]
         [Compare(nameof(Password))]
+        [Display(Name = "Confirm password")]
         public string ConfirmPassword { get; set; }
         [Required]
         public string Name { get; set; }
